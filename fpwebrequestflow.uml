@@ -1,0 +1,35 @@
+@startuml
+
+start
+
+:Create and/or initialize session if requested, handling
+OnNewSession and/or OnSessionExpired event (CheckSession);
+:Call pre module request handler (DoBeforeRequest);
+:Initialize session response, e.g.:
+add cookie to response (InitSession);
+
+partition "Our Concern" {
+  :Call module request handler (DoOnRequest);
+
+  if (Request handled?) then (yes)
+    :Send response content;
+  else (no)
+    if (Module template has content) then (yes)
+      :Send response from template;
+    else
+      :Delegate request handling to actions;
+      if (Request handled?) then (no)
+        :raise exception;
+        stop
+      endif      
+    endif
+  endif
+}
+
+:Call post module request handler (DoAfterResponse);
+:Update session response (UpdateSession);
+:Clean up session (DoneSession);
+
+stop
+
+@enduml 

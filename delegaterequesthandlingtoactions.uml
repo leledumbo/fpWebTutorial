@@ -1,0 +1,37 @@
+@startuml
+
+start
+
+partition "GetRequestAction" {
+  :get action name (GetActionName);
+  if (action name empty?) then (no)
+    :find action;
+    if (action found?) then (no)
+      if (DefActionWhenUnknown set?) then (yes)
+        :get default action;
+        if (default action found?) then (no)
+          :raise exception;
+          stop
+        endif
+      else (no)
+        :raise exception;
+        stop
+      endif
+    endif
+  else (yes)
+    :get default action;
+    if (default action found?) then (no)
+      :raise exception;
+      stop
+    endif
+  endif
+}
+
+if (action found?) then (yes)
+  :set current action;
+  :call request handler;
+endif
+
+stop
+
+@enduml 
